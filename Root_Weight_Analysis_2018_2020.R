@@ -123,7 +123,7 @@ path <- "/Users/lwrogers/Desktop/Macrophomina Project(s)/Recovery Data/Plated_Ro
 
 library(readxl)
 
-df <- read_xlsx(path, 3) ## data containing overlapping fungicide treatment from 2018/2019/2020 sampling dates
+df <- read_xlsx(path, 6) ## data containing overlapping fungicide treatment from 2018/2019/2020 sampling dates
 
 df$fungtrt <- as.factor(df$fungtrt)
 
@@ -141,19 +141,11 @@ df$weight_value <- sapply(df$weight, chgtoletter)
 
 df <- as.data.frame(df)
 
-split_df <- split.data.frame(df, df$fungtrt)
-
-control <- split_df[[1]]
-trt1 <- split_df[[2]]
-
 ## looking at control only
 
-split_month <- split.data.frame(control, control$date)
+split_month <- split.data.frame(df, df$date)
 
-# question: does M. phaseolina recovery change for samples that contained less than 0.5 g of roots?
-
-t.test(recovery ~ weight_value, data = control) # control treatments across all months
-t.test(recovery ~ weight_value, data = trt1) # fungicide treatments across all months
+t.test(recovery ~ weight_value, data = df) # control treatment across all months
 
 # looking at t test analysis for each month using lapply?
 
