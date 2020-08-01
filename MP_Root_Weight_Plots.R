@@ -114,11 +114,32 @@ ggplot(control_means, aes(x = Group.1, group = 1)) +
         axis.title.x = element_text(size = 13, hjust = 0.5, vjust = 2),
         plot.title = element_text(color = "black", hjust = 0.5))
 
-## write to file
+## write to EMF file
 
 setwd("/Users/lwrogers/Desktop/Macrophomina Project(s)/PH Breif/")
 
-emf(file = "control_rec_wt.emf", width = 14, height = 11)
+emf(file = "control_rec_wt.emf", width = 10, height = 6)
+
+ggplot(control_means, aes(x = Group.1, group = 1)) +
+  geom_line(aes(y=recovery), size=2, color="#69b3a2") +
+  geom_line(aes(y=weight*100), size=2, color="blue") +
+  scale_y_continuous(name = "Mean Recovery of M. phaseolina for each date (%)",
+                     sec.axis = sec_axis(trans=~./100, name="Mean Root Sample Weight for each date (g)")) +
+  theme_ipsum() +
+  xlab("Sampling Date") +
+  ggtitle("Mean Recovery and Sample Weight for each Sampling Date") +
+  theme(axis.title.y = element_text(size = 13, hjust = 0.5, vjust = 2, color = "#69b3a2"),
+        axis.title.y.right = element_text(size = 13, hjust = 0.5, vjust = 2, angle = 270, color = "blue"),
+        axis.title.x = element_text(size = 13, hjust = 0.5, vjust = 2),
+        plot.title = element_text(color = "black", hjust = 0.5))
+
+dev.off()
+
+# write to TIFF
+
+setwd("/Users/lwrogers/Desktop/Macrophomina Project(s)/PH Breif/")
+
+tiff("control_rec_wt.tiff", units = "in", width = 10, height = 6, res = 300)
 
 ggplot(control_means, aes(x = Group.1, group = 1)) +
   geom_line(aes(y=recovery), size=2, color="#69b3a2") +
