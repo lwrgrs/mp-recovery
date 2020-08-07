@@ -100,10 +100,9 @@ mean(root2_split[[3]]$recovery)
 path <- "/Users/lwrogers/Desktop/Macrophomina Project(s)/Recovery Data/Plated_Root_Weights_2018-20.xlsx"
 
 library(readxl)
+library(agricolae)
 
-df <- read_xlsx(path, 6) ## data containing overlapping fungicide treatment from 2018/2019/2020 sampling dates
-
-df$fungtrt <- as.factor(df$fungtrt)
+df <- read_xlsx(path, 6) # data containing overlapping fungicide treatment from 2018/2019/2020 sampling dates
 
 chgtoletter <- function(x){
   if(x == 0.5){
@@ -111,11 +110,32 @@ chgtoletter <- function(x){
   } else {
     print("Less")
   }
-}
+} # function if splitting groups based on weights = 0.5 and < 0.5
+
+chgtoletter <- function(x){
+  if(x > 0.4){
+    print("Greater")
+  } else {
+    print("Less")
+  }
+} # function if splitting groups based on weights > 0.4 and < 0.4
+
+chgtoletter2 <- function(x){
+  if(x == 0.00){
+    print("none")
+  } else if(x == 0.33) {
+      print("one third")
+  } else if(x == 0.67) {
+      print("two thirds")
+  } else if(x == 1.00) {
+      print("all")
+  }
+} # function for changing recovery values to factors
+
+df$recovery <- sapply(df$recovery, round, 2)
+df$recvalue <- sapply(df$recovery, chgtoletter2)
 
 df$weight_value <- sapply(df$weight, chgtoletter)
-# df$weight_value <- unlist(df$weight_value, use.names = T)
-# df$weight_value <- as.factor(df$weight_value)
 
 df <- as.data.frame(df)
 
@@ -126,14 +146,19 @@ split_month <- split.data.frame(df, df$date)
 t.test(recovery ~ weight_value, data = df) # control treatment across all months
 
 # looking at t test analysis for each month using lapply?
+### lapply(split_month, t.test(recovery ~ weight_value))
 
-lapply(split_month, t.test(recovery ~ weight_value))
-
-# looking at t test analysis for each month manually
+###
+#### looking at t test analysis for each month manually
+###
 
 # 10.10.18
 
 t.test(recovery ~ weight_value, split_month[[1]])
+
+m1 <- aov(weight ~ recvalue, split_month[[1]]) # looking at effect of recovery on weight
+summary(m1)
+LSD.test(m1, recvalue)
 
 # 10.29.18
 
