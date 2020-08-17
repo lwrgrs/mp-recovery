@@ -113,7 +113,7 @@ chgtoletter <- function(x){
 } # function if splitting groups based on weights = 0.5 and < 0.5
 
 chgtoletter <- function(x){
-  if(x > 0.4){
+  if(x > 0.46){
     print("Greater")
   } else {
     print("Less")
