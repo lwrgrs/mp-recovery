@@ -136,17 +136,44 @@ df$recovery <- sapply(df$recovery, round, 2)
 df$recvalue <- sapply(df$recovery, chgtoletter2)
 
 df$weight_value <- sapply(df$weight, chgtoletter)
+df$weight_value <- as.factor(df$weight_value)
 
 df <- as.data.frame(df)
+df_less <- subset(df, weight_value == "Less")
+df_less_sd <- sd(df_less$recovery)
+
+df_greater <- subset(df, weight_value == "Greater")
+df_greater_sd <- sd(df_greater$recovery)
+
+df_sd <- sd(df$recovery)
+df_mean <- mean(df$recovery)
+samp <- sqrt(24)
 
 ## looking at control only
 
 split_month <- split.data.frame(df, df$date)
+split_month_less <- split.data.frame(df_less, df_less$date)
+split_month_greater <- split.data.frame(df_greater, df_greater$date)
+
+## mean and std error for greater than group
+
+for (i in 1:length(split_month_greater)){
+    print(c(round(mean(split_month_greater[[i]]$recovery), 4), "plusminus", 
+          round(df_greater_sd/sqrt(nrow(split_month_greater[[i]])), 3)))
+}
+
+## mean and std error for less than group
+
+for (i in 1:length(split_month_less)){
+  print(c(round(mean(split_month_less[[i]]$recovery), 4), "plusminus", 
+          round(df_less_sd/sqrt(nrow(split_month_less[[i]])), 3)))
+}
+
+for (i in 1:length(split_month)){
+  print(t.test(split_month[[i]]$recovery ~ split_month[[i]]$weight_value, split_month[[i]]))
+}
 
 t.test(recovery ~ weight_value, data = df) # control treatment across all months
-
-# looking at t test analysis for each month using lapply?
-### lapply(split_month, t.test(recovery ~ weight_value))
 
 ###
 #### looking at t test analysis for each month manually
