@@ -1,3 +1,141 @@
+###### looking at control only ####################################################################################################
+
+path <- "/Users/lwrogers/Desktop/Macrophomina Project(s)/Recovery Data/Plated_Root_Weights_2018-20.xlsx"
+
+library(readxl)
+library(agricolae)
+
+df <- read_xlsx(path, 6) # control data from 2018-2020
+
+chgtoletter <- function(x){
+  if(x == 0.5){
+    print("Equal")
+  } else {
+    print("Less")
+  }
+} # function if splitting groups based on weights = 0.5 and < 0.5
+
+chgtoletter <- function(x){
+  if(x > 0.46){
+    print("Greater")
+  } else {
+    print("Less")
+  }
+} # function if splitting groups based on weights > 0.4 and < 0.4
+
+chgtoletter2 <- function(x){
+  if(x == 0.00){
+    print("none")
+  } else if(x == 0.33) {
+      print("one third")
+  } else if(x == 0.67) {
+      print("two thirds")
+  } else if(x == 1.00) {
+      print("all")
+  }
+} # function for changing recovery values to factors
+
+## format data.frame
+
+df2$recovery <- sapply(df2$recovery, round, 2)
+df2$recvalue <- sapply(df2$recovery, chgtoletter2)
+
+df$weight_value <- sapply(df$weight, chgtoletter)
+df$weight_value <- as.factor(df$weight_value)
+
+df <- as.data.frame(df)
+
+df$recovery <- df$recovery*100 # make into percents
+
+## split df based on month #################################
+
+split_month <- split.data.frame(df, df$date)
+split_month_less <- split.data.frame(df_less, df_less$date)
+split_month_greater <- split.data.frame(df_greater, df_greater$date)
+
+## mean and std error for greater than 0.46 weight group
+
+df_greater <- subset(df, weight_value == "Greater")
+df_greater_sd <- sd(df_greater$recovery)
+
+df_sd <- sd(df$recovery)
+df_mean <- mean(df$recovery)
+samp <- sqrt(24)
+
+for (i in 1:length(split_month_greater)){
+    print(c(round(mean(split_month_greater[[i]]$recovery), 4), "plusminus", 
+          round(df_greater_sd/sqrt(nrow(split_month_greater[[i]])), 3)))
+}
+
+## mean and std error for less than 0.46 weight group
+
+df_less <- subset(df, weight_value == "Less")
+df_less_sd <- sd(df_less$recovery)
+
+for (i in 1:length(split_month_less)){
+  print(c(round(mean(split_month_less[[i]]$recovery), 4), "plusminus", 
+          round(df_less_sd/sqrt(nrow(split_month_less[[i]])), 3)))
+}
+
+for (i in 1:length(split_month)){
+  print(t.test(split_month[[i]]$recovery ~ split_month[[i]]$weight_value, split_month[[i]]))
+}
+
+### mean recovery +- std error for each month
+
+for (i in 1:length(split_month)){
+  print(c(round(mean(split_month[[i]]$recovery), 3), "+-",
+        round(sd(split_month[[i]]$recovery)/sqrt(nrow(split_month[[i]])), 3)))
+}
+
+### mean weight +- std error for each month
+
+for (i in 1:length(split_month)){
+  print(c(round(mean(split_month[[i]]$weight), 3), "+-",
+          round(sd(split_month[[i]]$weight)/sqrt(nrow(split_month[[i]])), 3)))
+}
+
+### t.test analysis for each month for each month (two groups corresponding to weight)
+
+for (i in 1:length(split_month)){
+  print(t.test(recovery ~ weight_value, split_month[[i]]))
+}
+
+### ANOVA for recovery ~ date
+
+c_aov1 <- aov(recovery ~ date, data = df)
+summary(c_aov1)
+
+LSD.test(c_aov1, "date", console = T)
+
+### ANOVA for weight ~ date
+
+c_aov2 <- aov(weight ~ date, data = df)
+summary(c_aov2)
+
+LSD.test(c_aov2, "date", console = T)
+
+####################
+###################
+##################
+#################
+################
+###############
+##############
+#############
+############
+###########
+##########
+#########
+########
+#######
+######
+#####
+####
+###
+##
+#
+
 path <- "/Users/Layne/Desktop/Macrophomina Project(s)/Recovery Data/Plated_Root_Weights_2018-20.xlsx"
 
 library(readxl)
@@ -21,14 +159,6 @@ root1_split <- split(root1, list(root1$fungtrt, root1$fumtrt))
 ### same thing for 2019-20 data
 
 root2_split <- split(root2, levels(root2$fungtrt))
-
-#######
-##########
-#############
-################
-#############
-##########
-#######
 
 ### checking for relationships; 2018-2019
 
@@ -94,131 +224,3 @@ summary(aov7)
 
 mean(root2_split[[3]]$weight)
 mean(root2_split[[3]]$recovery)
-
-##########################################################################################################
-
-path <- "/Users/lwrogers/Desktop/Macrophomina Project(s)/Recovery Data/Plated_Root_Weights_2018-20.xlsx"
-
-library(readxl)
-library(agricolae)
-
-df <- read_xlsx(path, 6) # data containing overlapping fungicide treatment from 2018/2019/2020 sampling dates
-
-chgtoletter <- function(x){
-  if(x == 0.5){
-    print("Equal")
-  } else {
-    print("Less")
-  }
-} # function if splitting groups based on weights = 0.5 and < 0.5
-
-chgtoletter <- function(x){
-  if(x > 0.46){
-    print("Greater")
-  } else {
-    print("Less")
-  }
-} # function if splitting groups based on weights > 0.4 and < 0.4
-
-chgtoletter2 <- function(x){
-  if(x == 0.00){
-    print("none")
-  } else if(x == 0.33) {
-      print("one third")
-  } else if(x == 0.67) {
-      print("two thirds")
-  } else if(x == 1.00) {
-      print("all")
-  }
-} # function for changing recovery values to factors
-
-df$recovery <- sapply(df$recovery, round, 2)
-df$recvalue <- sapply(df$recovery, chgtoletter2)
-
-df$weight_value <- sapply(df$weight, chgtoletter)
-df$weight_value <- as.factor(df$weight_value)
-
-df <- as.data.frame(df)
-df_less <- subset(df, weight_value == "Less")
-df_less_sd <- sd(df_less$recovery)
-
-df_greater <- subset(df, weight_value == "Greater")
-df_greater_sd <- sd(df_greater$recovery)
-
-df_sd <- sd(df$recovery)
-df_mean <- mean(df$recovery)
-samp <- sqrt(24)
-
-## looking at control only
-
-split_month <- split.data.frame(df, df$date)
-split_month_less <- split.data.frame(df_less, df_less$date)
-split_month_greater <- split.data.frame(df_greater, df_greater$date)
-
-## mean and std error for greater than group
-
-for (i in 1:length(split_month_greater)){
-    print(c(round(mean(split_month_greater[[i]]$recovery), 4), "plusminus", 
-          round(df_greater_sd/sqrt(nrow(split_month_greater[[i]])), 3)))
-}
-
-## mean and std error for less than group
-
-for (i in 1:length(split_month_less)){
-  print(c(round(mean(split_month_less[[i]]$recovery), 4), "plusminus", 
-          round(df_less_sd/sqrt(nrow(split_month_less[[i]])), 3)))
-}
-
-for (i in 1:length(split_month)){
-  print(t.test(split_month[[i]]$recovery ~ split_month[[i]]$weight_value, split_month[[i]]))
-}
-
-t.test(recovery ~ weight_value, data = df) # control treatment across all months
-
-###
-#### looking at t test analysis for each month manually
-###
-
-# 10.10.18
-
-t.test(recovery ~ weight_value, split_month[[1]])
-
-m1 <- aov(weight ~ recvalue, split_month[[1]]) # looking at effect of recovery on weight
-summary(m1)
-LSD.test(m1, recvalue)
-
-# 10.29.18
-
-t.test(recovery ~ weight_value, split_month[[2]])
-
-# 12.18.18
-
-t.test(recovery ~ weight_value, split_month[[3]])
-
-# 2.1.19
-
-t.test(recovery ~ weight_value, split_month[[4]])
-
-# 3.7.19
-
-t.test(recovery ~ weight_value, split_month[[5]])
-
-# 4.23.19
-
-t.test(recovery ~ weight_value, split_month[[6]])
-
-# 10.18.19
-
-t.test(recovery ~ weight_value, split_month[[7]])
-
-# 11.22.19
-
-t.test(recovery ~ weight_value, split_month[[8]])
-
-# 12.13.19
-
-t.test(recovery ~ weight_value, split_month[[9]])
-
-# 1.24.19
-
-t.test(recovery ~ weight_value, split_month[[10]])
