@@ -37,8 +37,15 @@ chgtoletter2 <- function(x){
 
 ## format data.frame
 
-df2$recovery <- sapply(df2$recovery, round, 2)
-df2$recvalue <- sapply(df2$recovery, chgtoletter2)
+df$recovery <- sapply(df$recovery, round, 2)
+df$recvalue <- sapply(df$recovery, chgtoletter2)
+
+## subset based on recovery
+
+none <- subset(df, df$recvalue == "none")
+one_third <- subset(df, df$recvalue == "one third")
+two_thirds <- subset(df, df$recvalue == "two thirds")
+all <- subset(df, df$recvalue == "all")
 
 df$weight_value <- sapply(df$weight, chgtoletter)
 df$weight_value <- as.factor(df$weight_value)
@@ -114,6 +121,12 @@ c_aov2 <- aov(weight ~ date, data = df)
 summary(c_aov2)
 
 LSD.test(c_aov2, "date", console = T)
+
+### lm for recovery ~ weight for each month
+
+for (i in 1:length(split_month)){
+  print(summary(lm(recovery ~ weight, data = split_month[[i]])))
+}
 
 ####################
 ###################
