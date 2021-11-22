@@ -1,3 +1,3 @@
-# macrophomina
+# mp-recovery
 
-Contains all R scripts I am using and have used for my work with <em>Macrophomina phaseolina</em>.
+This repo contains the R scripts used to perform analyses for my project looking at the recovery of the fungal plant pathogen, <em>Macrophomina phaseolina</em>, from roots collected from field-planted stevia.
